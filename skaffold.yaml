@@ -7,8 +7,11 @@ deploy:
 build:
   local:
     push: false
+  # googleCloudBuild:
+  #   projectId: eng-genius-287901
   artifacts:
     - image: blancnoirtw/auth
+      # - image: us.gcr.io/eng-genius-287901/auth
       context: auth
       docker:
         dockerfile: Dockerfile

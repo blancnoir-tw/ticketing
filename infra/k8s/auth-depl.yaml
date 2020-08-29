@@ -15,6 +15,7 @@ spec:
       containers:
         - name: auth
           image: blancnoirtw/auth
+          # image: us.gcr.io/eng-genius-287901/auth
 ---
 apiVersion: v1
 kind: Service
