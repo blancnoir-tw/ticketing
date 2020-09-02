@@ -19,7 +19,7 @@ router.post(
     const ticket = Ticket.build({ title, price, userId: req.currentUser!.id }) // currentUser is defined by requireAuth
     await ticket.save()
 
-    res.sendStatus(201)
+    res.status(201).send(ticket)
   }
 )
 
