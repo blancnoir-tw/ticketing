@@ -17,6 +17,8 @@ spec:
           image: blancnoirtw/auth
           # image: us.gcr.io/eng-genius-287901/auth
           env:
+            - name: MONGO_URI
+              value: 'mongodb://auth-mongo-srv:27017/auth'
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
