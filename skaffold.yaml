@@ -27,6 +27,14 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: blancnoirtw/orders
+      context: orders
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
     - image: blancnoirtw/client
       context: client
       docker:
