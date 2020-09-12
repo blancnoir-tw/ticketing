@@ -4,6 +4,8 @@ import mongoose from 'mongoose'
 import { requireAuth, validateRequest, NotFoundError, OrderStatus, BadRequestError } from '@twtickets/common'
 import { Order } from '../models/order'
 import { Ticket } from '../models/ticket'
+import { OrderCreatedPublisher } from '../events/publisher/order-created-publisher'
+import { natsWrapper } from '../nats-wrapper'
 
 const EXPIRATION_WINDOW_SECONDS = 15 * 60
 const router = express.Router()
@@ -42,6 +44,17 @@ router.post(
       ticket,
     })
     await order.save()
+
+    new OrderCreatedPublisher(natsWrapper.client).publish({
+      id: order.id,
+      status: order.status,
+      userId: order.userId,
+      expiresAt: order.expiresAt.toISOString(),
+      ticket: {
+        id: ticket.id,
+        price: ticket.price,
+      },
+    })
 
     res.status(201).send(order)
   }
