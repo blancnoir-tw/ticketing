@@ -1,5 +1,5 @@
 import { Message } from 'node-nats-streaming'
-import { Subjects, Listener, TicketUpdatedEvent, NotFoundError } from '@twtickets/common'
+import { Subjects, Listener, TicketUpdatedEvent } from '@twtickets/common'
 import { Ticket } from '../../models/ticket'
 import { queueGroupName } from './queue-group-name'
 
@@ -8,11 +8,10 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
   queueGroupName = queueGroupName
 
   async onMessage(data: TicketUpdatedEvent['data'], msg: Message) {
-    const { id, title, price } = data
+    const { id, version, title, price } = data
 
-    const ticket = await Ticket.findById(id)
+    const ticket = await Ticket.findByEvent({ id, version })
     if (!ticket) {
-      // throw new NotFoundError()
       throw new Error('Ticket not found')
     }
 
