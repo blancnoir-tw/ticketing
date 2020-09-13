@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express'
 import { requireAuth, NotFoundError, NotAuthorizedError } from '@twtickets/common'
 import { Order, OrderStatus } from '../models/order'
-import { OrderCreatedPublisher } from '../events/publisher/order-cancelled-publisher'
+import { OrderCanceledPublisher } from '../events/publisher/order-cancelled-publisher'
 import { natsWrapper } from '../nats-wrapper'
 
 const router = express.Router()
@@ -19,7 +19,7 @@ router.delete('/api/orders/:orderId', requireAuth, async (req: Request, res: Res
   order.status = OrderStatus.Cancelled
   await order.save()
 
-  new OrderCreatedPublisher(natsWrapper.client).publish({
+  new OrderCanceledPublisher(natsWrapper.client).publish({
     id: order.id,
     ticket: {
       id: order.ticket.id,
