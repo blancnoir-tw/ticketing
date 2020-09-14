@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import { body } from 'express-validator'
-import { validateRequest, NotFoundError, requireAuth, NotAuthorizedError } from '@twtickets/common'
+import { validateRequest, NotFoundError, requireAuth, NotAuthorizedError, BadRequestError } from '@twtickets/common'
 import { Ticket } from '../models/ticket'
 import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher'
 import { natsWrapper } from '../nats-wrapper'
@@ -25,6 +25,10 @@ router.put(
     // currentUser is defined by requireAuth
     if (ticket.userId !== req.currentUser!.id) {
       throw new NotAuthorizedError()
+    }
+
+    if (ticket.orderId) {
+      throw new BadRequestError('Cannot edit a reserved ticket')
     }
 
     const { title, price } = req.body
