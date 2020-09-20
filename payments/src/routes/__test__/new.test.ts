@@ -5,7 +5,7 @@ import { app } from '../../app'
 import { Order } from '../../models/order'
 import { stripe } from '../../stripe'
 
-jest.mock('../../stripe')
+// jest.mock('../../stripe')
 const stripeToken = 'tok_visa' // stripe test token
 const path = '/api/payments'
 
@@ -51,12 +51,12 @@ it('returns a 400 when purchasing a cancelled order', async () => {
 
 it('returns a 204 with valid inputs', async () => {
   const userId = mongoose.Types.ObjectId().toHexString()
-
+  const price = Math.floor(Math.random() * 10000)
   const order = Order.build({
     id: mongoose.Types.ObjectId().toHexString(),
     userId,
     version: 0,
-    price: 1000,
+    price,
     status: OrderStatus.Created,
   })
   await order.save()
@@ -67,8 +67,15 @@ it('returns a 204 with valid inputs', async () => {
     .send({ token: stripeToken, orderId: order.id })
     .expect(201)
 
-  const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0]
-  expect(chargeOptions.source).toEqual(stripeToken)
-  expect(chargeOptions.amount).toEqual(1000)
-  expect(chargeOptions.currency).toEqual('jpy')
+  // use mock
+  // const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0]
+  // expect(chargeOptions.source).toEqual(stripeToken)
+  // expect(chargeOptions.amount).toEqual(1000)
+  // expect(chargeOptions.currency).toEqual('jpy')
+
+  // use test api
+  const stripeCharges = await stripe.charges.list({ limit: 50 })
+  const stripeCharge = stripeCharges.data.find(charge => charge.amount === price)
+  expect(stripeCharge).toBeDefined()
+  expect(stripeCharge!.currency).toEqual('jpy')
 })
